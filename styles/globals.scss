@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+h3{
+  font-family: var(--font-montserrat_Alternates);
+  font-size: 32px;
+  color: #FDCCE0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.allura{
+  font-family: var(--font-allura);
+}
+.montserrat_Alternates{
+  font-family: var(--font-montserrat_Alternates);
+
+}
+.robotomono{
+  font-family: var(--font-roboto-mono);
+}
+
+.londrinaoutline{
+  font-family:  var(--font-londrina-outline);
+}
+.lemonada{
+  font-family:  var(--font-lemonada);
+}
+.libre_Franklin{
+  font-family:  var(--font-libre_Franklin);
+}
+

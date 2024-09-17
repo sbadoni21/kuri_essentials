@@ -37,10 +37,10 @@ const HeroSection = () => {
             K
           </p>
           <img
-        src="/highlightedproduct.png"
-        alt="Background Image"
-        className="absolute inset-0 w-full h-full  object-scale-down object-top -z-10 bg-bgmain2  "
-      />
+            src="/highlightedproduct.png"
+            alt="Background Image"
+            className="absolute inset-0 w-full h-full  object-scale-down object-top -z-10 bg-bgmain2  "
+          />
           <div className="flex flex-col items-start justify-start ">
             <div className="flex justify-start items-end align-bottom">
               <p
@@ -100,7 +100,7 @@ const HeroSection = () => {
         </div>
       )}
       {showSmallScreen && (
-        <div className=" text-white items-center bg-gradient-to-t from-bgmain from-10% to-black to-95%  text-8xl w-full ">
+        <div className=" text-white items-center  text-8xl w-full ">
           <div className=" pt-40 pb-48 flex flex-col items-center justify-center ">
             <div className="flex justify-center items-center  align-bottom">
               <p
@@ -109,6 +109,11 @@ const HeroSection = () => {
               >
                 S
               </p>
+              <img
+                src="/highlightedproduct.png"
+                alt="Background Image"
+                className="absolute inset-0 w-full h-full  object-scale-down object-center -translate-y-40new -z-10 bg-bgmain2  "
+              />
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
                 className="allura  transition-opacity duration-1000 ease-in delay-300 "

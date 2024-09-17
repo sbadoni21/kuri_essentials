@@ -6,7 +6,30 @@ import Space16 from "../backend/Space16";
 import { getDocs, collection } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import Link from "next/link";
+import TitleSection from "./TitleSection";
+import "@/styles/globals.scss";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
+const PrevArrow = ({ onClick }) => (
+  <div
+    className="absolute left-0 flex items-center justify-center w-12 h-12 bg-white text-bgmain4  rounded-full shadow-lg cursor-pointer z-10"
+    onClick={onClick}
+    style={{ top: '50%', transform: 'translateY(-50%)' }}
+  >
+    < FaArrowLeft />
+  </div>
+);
+
+const NextArrow = ({ onClick }) => (
+  <div
+    className="absolute right-0 flex items-center justify-center w-12 h-12 bg-white text-bgmain4  rounded-full shadow-lg cursor-pointer z-10"
+    onClick={onClick}
+    style={{ top: '50%', transform: 'translateY(-50%)' }}
+  >
+    < FaArrowRight />
+
+  </div>
+);
 
 const HomeProductSection = () => {
   const [loading, setLoading] = useState(true);
@@ -31,23 +54,25 @@ const HomeProductSection = () => {
   }, []);
 
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 2,
-    slidesToScroll: 2,
+    slidesToShow: 3,
+    slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
     responsive: [
       {
         breakpoint: 1024,
         settings: {
           slidesToShow: 2,
-          slidesToScroll: 2,
+          slidesToScroll: 1,
         },
       },
       {
-        breakpoint: 464,
+        breakpoint: 768,
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
@@ -57,36 +82,31 @@ const HomeProductSection = () => {
   };
 
   return (
-    <div
-      style={{ position: "relative" }}
-      className="md:h-full w-full bg-gradient-to-t from-black from-10% to-bgmain to-95% overflow-hidden"
-    >
-      <div className="flex items-start justify-start gap-4 p-4 md:pl-24">
-        <div className="text-4xl md:text-6xl allura text-white transition-opacity duration-1000 opacity-100 hover:opacity-50">
-          Best Products for you
-        </div>
+    <div className="bg-bgmain4 backdrop-blur-xl opacity-95 w-full py-10">
+      <div className="pl-5 pt-10 md:pl-10">
+        <TitleSection text={"Your Essentials"} />
       </div>
       <Space16 />
       <Space16 />
 
       {loading ? (
-        <Loader />
+        <div className="flex justify-center items-center h-64">
+          <Loader />
+        </div>
       ) : (
-        <Slider {...settings} className="pb-10">
-          {products.map((item, index) => (
-            <Link key={index} href={`/products/${item.id}`}>
-              <div className="shadow-xl shadow-gray-700 rounded-2xl overflow-hidden mx-4 my-6 flex-col montserrat_Alternates md:h-[460px]  text-white justify-between">
+        <Slider {...settings} className="relative px-12 md:px-20">
+          {products.map((item) => (
+            <Link key={item.id} href={`/products/${item.id}`}>
+              <div className="shadow-lg rounded-lg overflow-hidden mx-2 my-4 bg-white">
                 <img
                   src={item.imgURL}
                   alt={item.title}
-                  className="h-4/6 w-full object-center object-cover"
+                  className="w-full h-64 object-cover"
                 />
-                <div className="text-start m-4 text text-sm md:text-base">
-                  <p className="text-slate-700">{item.title}</p>
+                <div className="p-4">
+                  <p className="text-lg font-semibold text-gray-800">{item.title}</p>
                   <Space16 />
-                  <p className="text-sm md:text-base text-slate-700 text-primary">
-                    Rating : {item.rating}
-                  </p>
+                  <p className="text-sm text-gray-600">Rating: {item.rating}</p>
                 </div>
               </div>
             </Link>
@@ -94,11 +114,11 @@ const HomeProductSection = () => {
         </Slider>
       )}
 
-      <div className="flex justify-center items-center pb-2">
+      <div className="flex justify-center items-center mt-6">
         <Link href="/products">
-          <div className="pt-3 text-2xl allura bg-gradient-to-r shadow-2xl shadow-gray-600 from-bgmain from-10% to-black to-95% text-white p-16 pb-2 pr-4 pl-4 rounded-3xl bg-pink-300">
+        <button className="px-6 py-3 rounded-3xl bg-transparent border-white border-2 text-white text-2xl backdrop-blur-2xl shadow-2xl shadow-bgmain transition-all duration-300 hover:bg-white hover:text-black hover:shadow-[0_0_20px_10px_rgba(255,255,255,0.6)] hover:border-transparent">
             See all...
-          </div>
+          </button>
         </Link>
       </div>
     </div>

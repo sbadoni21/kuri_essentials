@@ -26,8 +26,8 @@ const TopNavBar = () => {
   return (
     <>
       {!showMenuButton && (
-        <div className="flex justify-center items-center text-white  allura text-3xl font-bold">
-          <div className="fixed top-0 flex justify-center gap-16 items-center pt-4 pb-4 pr-10 pl-10 bg-transparent w-4/5 rounded-full backdrop-filter backdrop-blur-2xl h-16 z-10">
+        <div className="flex justify-center items-center text-bgmain4  allura text-3xl font-bold">
+          <div className="fixed top-0 flex justify-center gap-16 items-center pt-4 pb-4 pr-10 pl-10 bg-white w-screen rounded-b-full backdrop-filter backdrop-blur-2xl h-16 z-10">
             <Link href="/">Home</Link>
             <Link href="/products">Products</Link>
             {/* <Link href="/aboutus">About Us</Link> */}

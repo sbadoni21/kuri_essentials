@@ -10,23 +10,21 @@ import Footer from "@/components/frontend/Footer";
 import firebase_app, { db } from "@/firebase/firebase";
 import VideoPage from "@/pages/frontend/VideoPage";
 import VideoSection from "@/components/frontend/VideoSection";
+import ShopNowSection from "@/components/frontend/ShopNowSection";
+import CategoriesSection from "@/components/frontend/CategoriesSection";
+import HighlightProduct from "@/components/frontend/HighlightProduct";
 
 const HomePage = () => {
-  const [showContent, setShowContent] = useState(false);
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      setShowContent(true);
-    }, 200);
-
-    return () => clearTimeout(delay);
-  }, []);
 
   return (
-    <div className="">
+    <div className="overflow-x-hidden">
       <TopNavBar />
       <HeroSection />
+      <CategoriesSection/>
+      <ShopNowSection />
       <HomeProductSection />
+      <HighlightProduct />
       {/* <BlogSection/> */}
       {/* <VideoSection/> */}
       {/* <Instagram /> */}

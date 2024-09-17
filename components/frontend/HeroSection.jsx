@@ -29,14 +29,19 @@ const HeroSection = () => {
   return (
     <>
       {!showSmallScreen && (
-        <div className="flex bg-gradient-to-t from-bgmain from-50% to-black to-95% justify-center text-white items-center h-screen text-9xl w-full">
+        <div className="flex  justify-center text-white items-center h-screen text-9xl w-full">
           <p
             style={{ opacity: showContent ? 1 : 0 }}
             className="allura text-[400px] transition-opacity duration-1000 ease-in"
           >
             K
           </p>
-          <div className="flex flex-col items-start justify-start">
+          <img
+        src="/highlightedproduct.png"
+        alt="Background Image"
+        className="absolute inset-0 w-full h-full  object-scale-down object-top -z-10 bg-bgmain2  "
+      />
+          <div className="flex flex-col items-start justify-start ">
             <div className="flex justify-start items-end align-bottom">
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
@@ -84,13 +89,13 @@ const HeroSection = () => {
             {/* <div className="w-48 h-20 bg-black text-white rounded-full flex items-center justify-center">
               Blogs
             </div> */}
-            <Link href={"/products"} className="w-48 h-20 bg-black text-white rounded-full  flex items-center justify-center">
+            {/* <Link href={"/products"} className="w-48 h-20 bg-black text-white rounded-full  flex items-center justify-center">
               Organics
             </Link>
 
             <Link href={"/products"} className="w-48 h-20 bg-black text-white rounded-full  flex items-center justify-center">
               Essential Oils
-            </Link>
+            </Link> */}
           </div>
         </div>
       )}

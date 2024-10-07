@@ -1,7 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { db, storage } from "../../../../firebase/firebase";
-import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import {
   addDoc,
   collection,
@@ -17,33 +22,79 @@ const AddProductForm = () => {
   const [productData, setProductData] = useState({
     description: "",
     imgURL: null,
-    link: "",
-    rating: "",
     title: "",
+    price: "",
     tags: [],
+    productSpecification: [],
     categories: [],
+    routines: [],
+    inventory: ""
+
   });
   const [showLoader, setShowLoader] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showModal, setShowModal] = useState(false);
+
   const [products, setProducts] = useState([]);
   const [deleteConfirmation, setDeleteConfirmation] = useState({
-    id:"",
-    url:""
+    id: "",
+    url: "",
   });
+  const [routines, setRoutines] = useState([]);
+
   const [tags, setTags] = useState([]);
   const [categories, setCategories] = useState([]);
   const [edit, setEdit] = useState(false);
   const [upload, setUpload] = useState(false);
   const [editID, setEditID] = useState("");
+  const [showSpecsModel, setSpecsModel] = useState(false);
+  const [specifications, setSpecifications] = useState([]);
+
+  const handleChangeSpecs = (index, field, value) => {
+    const newSpecifications = [...specifications];
+    newSpecifications[index][field] = value;
+    setSpecifications(newSpecifications);
+  };
+
+  const handleAddSpecification = (id) => {
+    setEditID(id);
+    const itemToEdit = products.find((item) => item.id == id);
+    setProductData((prevState) => ({
+      id: itemToEdit.id,
+      ...itemToEdit,
+    }));
+    setSpecifications(itemToEdit.specifications || [{ name: "", value: "" }]);
+  };
+
+  const handleRemoveSpecification = (index) => {
+    const newSpecifications = specifications.filter((_, i) => i !== index);
+    setSpecifications(newSpecifications);
+  };
+
+  const handleSave = async () => {
+    try {
+      const productDocRef = doc(db, "product", editID);
+      await updateDoc(productDocRef, { specifications });
+      alert("specs added");
+      setSpecifications([{ name: "", value: "" }]);
+      setSpecsModel(false);
+      fetchProducts();
+    } catch (error) {
+      console.error("Error saving specifications:", error);
+      toast.error("Failed to save specifications. Please try again.");
+    }
+  };
 
   const fetchProducts = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "product"));
       const productsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
+        specifications: doc.specifications || [],
+
         ...doc.data(),
       }));
+      console.log(productsData);
       setProducts(productsData);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -57,6 +108,18 @@ const AddProductForm = () => {
         ...doc.data(),
       }));
       setTags(tagsData);
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+    }
+  };
+  const fetchRoutines = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "routines"));
+      const routinesData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRoutines(routinesData);
     } catch (error) {
       console.error("Error fetching tags:", error);
     }
@@ -76,6 +139,7 @@ const AddProductForm = () => {
   useEffect(() => {
     fetchTags();
     fetchProducts();
+    fetchRoutines();
     fetchCategories();
   }, []);
 
@@ -85,6 +149,7 @@ const AddProductForm = () => {
       id: itemToEdit.id,
       ...itemToEdit,
     }));
+    setSpecifications(itemToEdit.specifications || [{ name: "", value: "" }]);
 
     setEditID(id);
     setShowModal(true);
@@ -98,12 +163,13 @@ const AddProductForm = () => {
       [name]: value,
     }));
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const storageRef = ref(storage, `product_images/${Date.now()}`);
       const uploadTask = uploadBytesResumable(storageRef, productData.imgURL);
+
       uploadTask.on(
         "state_changed",
         (snapshot) => {
@@ -116,120 +182,140 @@ const AddProductForm = () => {
           console.error("Error uploading photo", error);
         },
         async () => {
-         const photoURL= await getDownloadURL(uploadTask.snapshot.ref);
+          const photoURL = await getDownloadURL(uploadTask.snapshot.ref);
           setShowLoader(false);
-          const docRef = collection(db, "product");
 
+          const docRef = collection(db, "product");
           if (edit) {
             const itemRef = doc(docRef, editID);
-            if(upload) {
-            await updateDoc(itemRef, {
+            const updateData = {
               description: productData.description,
-              imgURL:  photoURL,
-              link: productData.link,
-              rating: productData.rating,
               title: productData.title,
-              tags: productData.tags,                                                     
+              tags: productData.tags,
               categories: productData.categories,
-            });
+              price: productData.price,
+              routines: productData.routines,
+              inventory:productData.inventory
+            };
+            if (upload) updateData.imgURL = photoURL;
+
+            await updateDoc(itemRef, updateData);
             setUpload(false);
-            } else{
-              await updateDoc(itemRef, {
-                description: productData.description,
-                link: productData.link,
-                rating: productData.rating,
-                title: productData.title,
-                tags: productData.tags,                                                     
-                categories: productData.categories,
-              });
-            }       
           } else {
             const docRef2 = await addDoc(docRef, {
               description: productData.description,
               imgURL: photoURL,
-              link: productData.link,
-                rating: productData.rating,
               title: productData.title,
               tags: productData.tags,
               categories: productData.categories,
+              price: productData.price,
+              routines: productData.routines,
+              inventory:productData.inventory
+
             });
-            await updateDoc(docRef2, { id: docRef2.id });
           }
+
+          // Reset form fields after saving
           setProductData({
             description: "",
             imgURL: "",
-            link: "",
-            rating: "",
             title: "",
+            price: "",
             tags: [],
             categories: [],
+            productSpecification: [],
+            routines: [],
+            inventory:""
+
           });
+          setEdit(false);
           setShowModal(false);
           fetchProducts();
-          setEdit(false);
-          console.log("Product added successfully!");
         }
       );
     } catch (error) {
       console.error("Error adding product: ", error);
     }
   };
+
   const confirmDelete = (id, imgURL) => {
-    setDeleteConfirmation({id, url:imgURL});
+    setDeleteConfirmation({ id, url: imgURL });
   };
   const handlePhotoChange = (e) => {
     setUpload(true);
     const file = e.target.files[0];
     setProductData({ ...productData, imgURL: file });
   };
-  const handleDelete = async ({id, url}) => {   
+  const handleDelete = async ({ id, url }) => {
     try {
-
       const storageRef = ref(storage, url);
       await deleteObject(storageRef);
       const photoRef = doc(db, "product", id);
       await deleteDoc(photoRef);
-       toast.success("Deleted Successfully !!!");
+      toast.success("Deleted Successfully !!!");
       setDeleteConfirmation({
-        id:"",
-        url:""
+        id: "",
+        url: "",
       });
       fetchProducts();
     } catch (error) {
       console.error("Error deleting:", error);
-     toast.error("Error deleting. Please try again.");
+      toast.error("Error deleting. Please try again.");
     }
   };
 
-const handleTagsChange = (e) => {
-  const { name, checked } = e.target;
-  if (checked) {
-    setProductData((prevState) => ({
-      ...prevState,
-      tags: [...prevState.tags, name],
-    }));
-  } else {
-    setProductData((prevState) => ({
-      ...prevState,
-      tags: prevState.tags.filter((tag) => tag !== name),
-    }));
-  }
-};
+  const handleTagsChange = (e) => {
+    const { name, checked } = e.target;
+    if (checked) {
+      setProductData((prevState) => ({
+        ...prevState,
+        tags: [...prevState.tags, name],
+      }));
+    } else {
+      setProductData((prevState) => ({
+        ...prevState,
+        tags: prevState.tags.filter((tag) => tag !== name),
+      }));
+    }
+  };
+  const handleRoutinesChange = (e) => {
+    const { name, checked } = e.target;
+  
+    setProductData((prevState) => {
+      // Ensure routines is always an array
+      const currentRoutines = Array.isArray(prevState.routines) ? prevState.routines : [];
+  
+      if (checked) {
+        return {
+          ...prevState,
+          routines: [...currentRoutines, name],
+        };
+      } else {
+        return {
+          ...prevState,
+          routines: currentRoutines.filter((routine) => routine !== name),
+        };
+      }
+    });
+  };
+  
 
-const handleCategoriesChange = (e) => {
-  const { name, checked } = e.target;
-  if (checked) {
-    setProductData((prevState) => ({
-      ...prevState,
-      categories: [...prevState.categories, name],
-    }));
-  } else {
-    setProductData((prevState) => ({
-      ...prevState,
-      categories: prevState.categories.filter((category) => category !== name),
-    }));
-  }
-};
+  const handleCategoriesChange = (e) => {
+    const { name, checked } = e.target;
+    if (checked) {
+      setProductData((prevState) => ({
+        ...prevState,
+        categories: [...prevState.categories, name],
+      }));
+    } else {
+      setProductData((prevState) => ({
+        ...prevState,
+        categories: prevState.categories.filter(
+          (category) => category !== name
+        ),
+      }));
+    }
+  };
 
   return (
     <div>
@@ -262,7 +348,35 @@ const handleCategoriesChange = (e) => {
               >
                 {product.link}
               </a>
+
+              <div className="mt-4">
+                <h4 className="text-md font-semibold mb-2">Specifications:</h4>
+                <ul className="list-disc list-inside">
+                  {product.specifications &&
+                  product.specifications.length > 0 ? (
+                    product.specifications.map((spec, index) => (
+                      <li key={index} className="text-gray-700">
+                        <strong>{spec.name}:</strong> {spec.value}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-500">
+                      No specifications available
+                    </li>
+                  )}
+                </ul>
+              </div>
+
               <div className="flex justify-end mt-4">
+                <button
+                  className="mr-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={() => {
+                    setSpecsModel(true);
+                    handleAddSpecification(product.id);
+                  }}
+                >
+                  Edit Specifications
+                </button>
                 <button
                   className="mr-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                   onClick={() => handleEdit(product.id)}
@@ -292,10 +406,12 @@ const handleCategoriesChange = (e) => {
                 Yes
               </button>
               <button
-                onClick={() => setDeleteConfirmation({
-                  id:"",
-                  url:""
-                })}
+                onClick={() =>
+                  setDeleteConfirmation({
+                    id: "",
+                    url: "",
+                  })
+                }
                 className="bg-gray-300 text-gray-900 py-2 px-4 rounded-lg"
               >
                 Cancel
@@ -304,6 +420,74 @@ const handleCategoriesChange = (e) => {
           </div>
         </div>
       )}
+      {showSpecsModel && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h2 className="text-xl font-semibold mb-4">
+                Add Product Specifications
+              </h2>
+              {specifications.map((spec, index) => (
+                <div key={index} className="flex items-center mb-3">
+                  <input
+                    type="text"
+                    placeholder="Field Name"
+                    value={spec.name}
+                    onChange={(e) =>
+                      handleChangeSpecs(index, "name", e.target.value)
+                    }
+                    className="border p-2 rounded mr-2 flex-1"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Field Value"
+                    value={spec.value}
+                    onChange={(e) =>
+                      handleChangeSpecs(index, "value", e.target.value)
+                    }
+                    className="border p-2 rounded mr-2 flex-1"
+                  />
+                  <button
+                    onClick={() => handleRemoveSpecification(index)}
+                    className="bg-red-500 text-white p-2 rounded"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+
+              {/* Add Specification Button */}
+              <button
+                onClick={() =>
+                  setSpecifications([
+                    ...specifications,
+                    { name: "", value: "" },
+                  ])
+                }
+                className="bg-blue-500 text-white p-2 rounded mb-4"
+              >
+                Add Specification
+              </button>
+
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setSpecsModel(false)}
+                  className="bg-gray-500 text-white p-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="bg-green-500 text-white p-2 rounded"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 text-slate-600">
           <div className="bg-white p-4 rounded-lg ">
@@ -343,6 +527,30 @@ const handleCategoriesChange = (e) => {
                   className="w-full text-black px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                 />
               </div>
+              <div className="mb-2">
+                <label htmlFor="description" className="block mb-1">
+                  Price:
+                </label>
+                <textarea
+                  id="price"
+                  name="price"
+                  value={productData.price}
+                  onChange={handleChange}
+                  className="w-full text-black border rounded-lg focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div className="mb-2">
+                <label htmlFor="description" className="block mb-1">
+                  Inventory:
+                </label>
+                <textarea
+                  id="inventory"
+                  name="inventory"
+                  value={productData.inventory}
+                  onChange={handleChange}
+                  className="w-full text-black border rounded-lg focus:outline-none focus:border-blue-500"
+                />
+              </div>
               <div className="mb-4">
                 <label htmlFor="imgFile" className="block mb-1">
                   Upload Image:
@@ -356,13 +564,15 @@ const handleCategoriesChange = (e) => {
                   className="w-full  px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                 />
               </div>
-              <div className="flex">       <div className="mb-4 overflow-y-auto" style={{ maxHeight: "100px" }}>
-
-                <label className="block mb-1 ">Tags:</label>
+              <div
+                className="mb-4 overflow-y-auto"
+                style={{ maxHeight: "100px" }}
+              >
+                <label className="block mb-1 ">Connect Routines:</label>
                 {tags.map((tag) => (
-                  <div                      key={tag.id} className="flex items-center">
+                  <div key={tag.id} className="flex items-center">
                     <input
-                    key={tag.id}
+                      key={tag.id}
                       type="checkbox"
                       id={tag.id}
                       name={tag.tag}
@@ -375,52 +585,51 @@ const handleCategoriesChange = (e) => {
                   </div>
                 ))}
               </div>
-              <div className="mb-4 overflow-y-auto" style={{ maxHeight: "100px" }}>
-
-                <label className="block mb-1">Categories:</label>
-                {categories.map((category) => (
-                  <div key={category.id} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id={category.id}
-                      name={category.id}
-                      value={category.id}
-                      checked={productData.categories.includes(category.id)}
-                      onChange={handleCategoriesChange}
-                      className="mr-2"
-                    />
-                    <label htmlFor={category.id}>{category.category}</label>
+              <div className="flex">
+                {" "}
+                <div
+                  className="mb-4 overflow-y-auto"
+                  style={{ maxHeight: "100px" }}
+                >
+                  <label className="block mb-1 ">Add Routines:</label>
+                  <div>
+                    {routines.map((tag) => (
+                      <div key={tag.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          name={tag.title}
+                          value={tag.title}
+                          checked={productData.routines && productData.routines.includes(tag.title)}
+                          onChange={handleRoutinesChange}
+                          className="mr-2"
+                        />
+                        <label htmlFor={tag.id}>{tag.title}</label>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div></div>
-             
+                </div>
+                <div
+                  className="mb-4 overflow-y-auto"
+                  style={{ maxHeight: "100px" }}
+                >
+                  <label className="block mb-1">Categories:</label>
+                  {categories.map((category) => (
+                    <div key={category.id} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={category.id}
+                        name={category.id}
+                        value={category.id}
+                        checked={productData.categories.includes(category.id)}
+                        onChange={handleCategoriesChange}
+                        className="mr-2"
+                      />
+                      <label htmlFor={category.id}>{category.category}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-              <div className="mb-4 ">
-                <label htmlFor="link" className="block mb-1">
-                  Link:
-                </label>
-                <input
-                  type="text"
-                  id="link"
-                  name="link"
-                  value={productData.link}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border text-black rounded-lg focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="rating" className="block mb-1">
-                  Rating:
-                </label>
-                <input
-                  type="text"
-                  id="rating"
-                  name="rating"
-                  value={productData.rating}
-                  onChange={handleChange}
-                  className="w-full px-3 text-black py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                />
-              </div>
               <button
                 type="submit"
                 className="w-full py-2 bg-primary text-slate-500 rounded-lg focus:outline-none hover:bg-blue-600"

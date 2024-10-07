@@ -1,34 +1,22 @@
 "use client";
 import { useState, useEffect } from "react";
 import GoogleAdPcItem from "../backend/Ads";
-import Link from "next/link";
 
 const HeroSection = () => {
   const [showContent, setShowContent] = useState(false);
-  const [showSmallScreen, setshowSmallScreen] = useState(false);
 
   useEffect(() => {
     const delay = setTimeout(() => {
       setShowContent(true);
-    }, 200);
+    }, 10);
 
     return () => clearTimeout(delay);
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setshowSmallScreen(window.innerWidth < 768);
-    };
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   return (
     <>
-      {!showSmallScreen && (
+      <div className="hidden md:flex">
+        {" "}
         <div className="flex  justify-center text-white items-center h-screen text-9xl w-full">
           <p
             style={{ opacity: showContent ? 1 : 0 }}
@@ -54,35 +42,25 @@ const HeroSection = () => {
                 style={{ opacity: showContent ? 1 : 0 }}
                 className="text-9xl allura transition-opacity duration-1000 ease-in delay-500"
               >
-                Orginials
+                Essentials
               </p>
             </div>
 
             <div className="flex items-end justify-start align-bottom">
+           
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
-                className="allura text-9xl pr-4  transition-opacity duration-1000 ease-in delay-700"
+                className="allura text-6xl pr-4   transition-opacity duration-1000 ease-in delay-1000 font-semibold"
               >
-                By
+                Simply Natural
               </p>
+         
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
-                className="londrinaoutline text-9xl pr-4   transition-opacity duration-1000 ease-in delay-1000 font-bold"
+                className="allura text-6xl transition-opacity duration-1000 ease-in delay-1000 font-semibold"
               >
-                SHA
-              </p>
-              <p
-                style={{ opacity: showContent ? 1 : 0 }}
-                className="allura text-9xl pr-4   transition-opacity duration-1000 ease-in delay-1000"
-              >
-                &
-              </p>
-              <p
-                style={{ opacity: showContent ? 1 : 0 }}
-                className="londrinaoutline  transition-opacity duration-1000 ease-in delay-1000 font-bold"
-              >
-                RI
-              </p>
+                Simply Better
+                </p>
             </div>
           </div>
           <div className="flex flex-row absolute  top-[700px] gap-20  text-3xl text-center ">
@@ -98,66 +76,62 @@ const HeroSection = () => {
             </Link> */}
           </div>
         </div>
-      )}
-      {showSmallScreen && (
+      </div>
+      <div className=" h-[60vh] md:hidden">
+        {" "}
         <div className=" text-white items-center  text-8xl w-full ">
-          <div className=" pt-40 pb-48 flex flex-col items-center justify-center ">
-            <div className="flex justify-center items-center  align-bottom">
+          <div className=" pt-20  pb-20 flex flex-col items-center justify-center ">
+            <div className="flex justify-center items-end  align-bottom">
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
-                className="allura  transition-opacity duration-1000 ease-in "
+                className="allura text-[180px] transition-opacity duration-1000 ease-in "
               >
-                S
+                   K
               </p>
               <img
                 src="/highlightedproduct.png"
                 alt="Background Image"
-                className="absolute inset-0 w-full h-full  object-scale-down object-center -translate-y-40new -z-10 bg-bgmain2  "
+                className="absolute inset-0 w-full h-full  object-scale-down object-center -translate-y-28 -z-10 bg-bgmain2  "
               />
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
-                className="allura  transition-opacity duration-1000 ease-in delay-300 "
+                className="allura  transition-opacity -translate-y-10 duration-1000 ease-in delay-300 "
               >
-                elf
+                uri
               </p>
               <p style={{ opacity: showContent ? 1 : 0 }} className="w-4"></p>
-              <p
-                style={{ opacity: showContent ? 1 : 0 }}
-                className=" allura transition-opacity duration-1000 ease-in delay-500"
-              >
-                Care
-              </p>
+           
             </div>
-
-            <div
+            <p
+                style={{ opacity: showContent ? 1 : 0 }}
+                className=" allura transition-opacity duration-1000 -translate-y-6 ease-in delay-500"
+              >
+                Essentials 
+              </p>
+            {/* <div
               style={{ opacity: showContent ? 1 : 0 }}
               className="allura   pr-4 text-center items-center  transition-opacity duration-1000 ease-in delay-700"
             >
               By
-            </div>
-            <div className="flex items-end justify-start align-bottom">
+            </div> */}
+            <div className="flex flex-col items-center justify-start align-bottom text-5xl">
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
-                className="londrinaoutline  pr-4   transition-opacity duration-1000 ease-in delay-1000 font-extrabold"
+                className="allura  pr-4   transition-opacity duration-1000 ease-in delay-1000 font-semibold"
               >
-                SHA
+                Simply Natural
               </p>
+          
               <p
                 style={{ opacity: showContent ? 1 : 0 }}
-                className="allura  pr-4   transition-opacity duration-1000 ease-in delay-1000"
+                className="allura  transition-opacity duration-1000 ease-in delay-1000 font-semibold"
               >
-                &
-              </p>
-              <p
-                style={{ opacity: showContent ? 1 : 0 }}
-                className="londrinaoutline  transition-opacity duration-1000 ease-in delay-1000 font-extrabold"
-              >
-                RI
-              </p>
+                Simply Better
+                </p>
             </div>
           </div>
         </div>
-      )}
+      </div>
       <GoogleAdPcItem />
     </>
   );

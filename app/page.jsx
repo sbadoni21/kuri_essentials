@@ -13,6 +13,8 @@ import VideoSection from "@/components/frontend/VideoSection";
 import ShopNowSection from "@/components/frontend/ShopNowSection";
 import CategoriesSection from "@/components/frontend/CategoriesSection";
 import HighlightProduct from "@/components/frontend/HighlightProduct";
+import TopSellerSection from "@/components/frontend/TopSellingProducts";
+import AccoladesSection from "@/components/frontend/AccoladesSection";
 
 const HomePage = () => {
 
@@ -25,6 +27,8 @@ const HomePage = () => {
       <ShopNowSection />
       <HomeProductSection />
       <HighlightProduct />
+      <TopSellerSection/>
+      <AccoladesSection/>
       {/* <BlogSection/> */}
       {/* <VideoSection/> */}
       {/* <Instagram /> */}

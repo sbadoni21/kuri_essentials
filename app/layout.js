@@ -11,6 +11,7 @@ import {
   Libre_Franklin,
 } from "next/font/google";
 import Script from "next/script";
+import { ProductProvider } from "@/providers/ProductProvider";
 const allura = Allura({
   subsets: ["latin"],
   weight: ["400"],
@@ -110,8 +111,7 @@ export default function RootLayout({ children }) {
         className={`${allura.variable} ${montserrat_Alternates.variable} ${robotoMono.variable} ${londrinaoutline.variable}  ${lemonada.variable}`}
       >
         <ToastContainer />
-
-        {children}
+        <ProductProvider>{children}</ProductProvider>
       </body>
     </html>
   );
